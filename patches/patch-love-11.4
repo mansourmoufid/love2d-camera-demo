@@ -1,0 +1,61 @@
+--- src/modules/filesystem/physfs/Filesystem.cpp.orig	2022-05-20 20:57:08.000000000 -0400
++++ src/modules/filesystem/physfs/Filesystem.cpp	2022-05-20 20:57:41.000000000 -0400
+@@ -53,6 +53,10 @@
+ #include "common/android.h"
+ #endif
+ 
++#ifdef LOVE_MACOSX
++#include "common/macosx.h"
++#endif
++
+ namespace
+ {
+ 	size_t getDriveDelim(const std::string &input)
+@@ -89,6 +93,10 @@
+ 		return out.str();
+ 	}
+ 
++	std::string dirname(const std::string &path)
++	{
++		return path.substr(0, path.find_last_of("\\/"));
++	}
+ }
+ 
+ namespace love
+@@ -103,7 +111,20 @@
+ 	, fusedSet(false)
+ {
+ 	requirePath = {"?.lua", "?/init.lua"};
+-	cRequirePath = {"??"};
++	cRequirePath = {
++		"??",
++#ifdef LOVE_ANDROID
++		love::android::getCRequirePath(),
++#endif
++#ifdef LOVE_IOS
++		dirname(love::ios::getExecutablePath()) + "/?.dylib",
++		dirname(love::ios::getExecutablePath()) + "/?.so",
++#endif
++#ifdef LOVE_MACOSX
++		dirname(love::macosx::getExecutablePath()) + "/?.dylib",
++		dirname(love::macosx::getExecutablePath()) + "/?.so",
++#endif
++	};
+ }
+ 
+ Filesystem::~Filesystem()
+@@ -123,8 +144,12 @@
+ 
+ void Filesystem::init(const char *arg0)
+ {
+-	if (!PHYSFS_init(arg0))
+-		throw love::Exception("Failed to initialize filesystem: %s", PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()));
++	if (!PHYSFS_init(arg0)) {
++		PHYSFS_ErrorCode err = PHYSFS_getLastErrorCode();
++		if (err == PHYSFS_ERR_IS_INITIALIZED)
++			return;
++		throw love::Exception("Failed to initialize filesystem: %s", PHYSFS_getErrorByCode(err));
++	}
+ 
+ 	// Enable symlinks by default.
+ 	setSymlinksEnabled(true);
