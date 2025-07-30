@@ -1,0 +1,65 @@
+--- Makefile.orig	2022-01-29 13:36:05.000000000 -0500
++++ Makefile	2022-01-29 13:38:21.000000000 -0500
+@@ -16,7 +16,6 @@
+ MAJVER=  2
+ MINVER=  1
+ RELVER=  0
+-PREREL=  -beta3
+ VERSION= $(MAJVER).$(MINVER).$(RELVER)$(PREREL)
+ ABIVER=  5.1
+ 
+--- src/Makefile.orig	2022-02-09 22:59:36.000000000 -0500
++++ src/Makefile	2022-02-09 23:02:12.000000000 -0500
+@@ -27,7 +27,7 @@
+ DEFAULT_CC = gcc
+ #
+ # LuaJIT builds as a native 32 or 64 bit binary by default.
+-CC= $(DEFAULT_CC)
++CC?= $(DEFAULT_CC)
+ #
+ # Use this if you want to force a 32 bit build on a 64 bit multilib OS.
+ #CC= $(DEFAULT_CC) -m32
+@@ -188,11 +188,11 @@
+ #   make HOST_CC="gcc -m32" CROSS=i586-mingw32msvc- TARGET_SYS=Windows
+ #   make HOST_CC="gcc -m32" CROSS=powerpc-linux-gnu-
+ 
+-ASOPTIONS= $(CCOPT) $(CCWARN) $(XCFLAGS) $(CFLAGS)
++ASOPTIONS= $(CCOPT) $(CCWARN) $(XCFLAGS) $(CPPFLAGS) $(CFLAGS)
+ CCOPTIONS= $(CCDEBUG) $(ASOPTIONS)
+ LDOPTIONS= $(CCDEBUG) $(LDFLAGS)
+ 
+-HOST_CC= $(CC)
++HOST_CC?= $(CC)
+ HOST_RM?= rm -f
+ # If left blank, minilua is built and used. You can supply an installed
+ # copy of (plain) Lua 5.1 or 5.2, plus Lua BitOp. E.g. with: HOST_LUA=lua
+@@ -201,8 +201,8 @@
+ HOST_XCFLAGS= -I.
+ HOST_XLDFLAGS=
+ HOST_XLIBS=
+-HOST_ACFLAGS= $(CCOPTIONS) $(HOST_XCFLAGS) $(TARGET_ARCH) $(HOST_CFLAGS)
+-HOST_ALDFLAGS= $(LDOPTIONS) $(HOST_XLDFLAGS) $(HOST_LDFLAGS)
++HOST_ACFLAGS= $(HOST_XCFLAGS) $(TARGET_ARCH) $(HOST_CFLAGS)
++HOST_ALDFLAGS= $(HOST_XLDFLAGS) $(HOST_LDFLAGS)
+ HOST_ALIBS= $(HOST_XLIBS) $(LIBS) $(HOST_LIBS)
+ 
+ STATIC_CC = $(CROSS)$(CC)
+@@ -211,7 +211,8 @@
+ TARGET_STCC= $(STATIC_CC)
+ TARGET_DYNCC= $(DYNAMIC_CC)
+ TARGET_LD= $(CROSS)$(CC)
+-TARGET_AR= $(CROSS)ar rcus
++AR?= ar
++TARGET_AR= $(CROSS)$(AR) rcus
+ TARGET_STRIP= $(CROSS)strip
+ 
+ TARGET_LIBPATH= $(or $(PREFIX),/usr/local)/$(or $(MULTILIB),lib)
+@@ -596,7 +597,7 @@
+ endif
+ endif
+ 
+-Q= @
++Q= 
+ E= @echo
+ #Q=
+ #E= @:

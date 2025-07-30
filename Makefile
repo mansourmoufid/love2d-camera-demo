@@ -10,6 +10,12 @@ all: $(NAME).love
 DEPENDS:= \
 	al.lua
 
+LuaJIT:
+	git clone https://github.com/LuaJIT/LuaJIT.git
+	cd LuaJIT && git checkout v2.1
+	cd LuaJIT && git fetch
+	cd LuaJIT && git merge
+
 aluminium-library:
 	git clone https://github.com/mansourmoufid/aluminium-library.git
 	git fetch
