@@ -61,7 +61,7 @@ function love.load()
 
     love.window.setTitle(state.window.title)
     local width, height = 480, 640
-    if al.platform == 'android' then
+    if al.platform == 'android' or al.platform == 'ios' then
         width, height = love.graphics.getDimensions()
     end
     love.window.setMode(width, height, state.window.flags)
