@@ -65,7 +65,6 @@ function love.load()
         width, height = love.graphics.getDimensions()
     end
     love.window.setMode(width, height, state.window.flags)
-    love.resize(width, height)
 
     -- Very important step
     if al.platform == 'android' then
@@ -82,6 +81,9 @@ function love.load()
 end
 
 function love.update(dt)
+
+    state.window.width = love.graphics.getWidth()
+    state.window.height = love.graphics.getHeight()
 
     -- If the user is quitting, stop and free the camera object,
     -- and set the preview image to nil.
@@ -336,6 +338,4 @@ function love.keyreleased(key)
 end
 
 function love.resize(w, h)
-    state.window.width = w
-    state.window.height = h
 end
