@@ -21,7 +21,7 @@ aluminium-library:
 	git fetch
 	git merge
 
-al.lua: aluminium-library/al.lua
+al.lua: aluminium-library
 	cp -f aluminium-library/al.lua al.lua
 
 .PHONY: love
