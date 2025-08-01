@@ -1,0 +1,51 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
+    ndkVersion rootProject.ext.ndkVersion
+    defaultConfig {
+        applicationId 'ca.redpandatea.love2d.camera.demo'
+        versionCode 010
+        versionName '0.1.0'
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+    }
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    // flavorDimensions 'mode', 'recording'
+    flavorDimensions 'mode'
+    productFlavors {
+        // normal {
+        //     dimension 'mode'
+        // }
+        embed {
+            dimension 'mode'
+        }
+        // record {
+        //     dimension 'recording'
+        // }
+        // noRecord {
+        //     dimension 'recording'
+        // }
+    }
+    lintOptions {
+        abortOnError false
+    }
+    packagingOptions {
+        jniLibs {
+            useLegacyPackaging = true
+        }
+    }
+}
+
+dependencies {
+    api 'androidx.multidex:multidex:2.0.1'
+    api fileTree(dir: 'libs', include: ['*.jar'])
+    api 'androidx.appcompat:appcompat:1.4.0'
+    api project(':love')
+}

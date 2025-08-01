@@ -1,0 +1,31 @@
+--- love/src/jni/SDL2/src/video/android/SDL_androidwindow.c.orig	2022-02-12 13:42:37.000000000 -0500
++++ love/src/jni/SDL2/src/video/android/SDL_androidwindow.c	2022-02-12 13:42:51.000000000 -0500
+@@ -31,7 +31,6 @@
+ 
+ #include "SDL_androidvideo.h"
+ #include "SDL_androidwindow.h"
+-#include "SDL_hints.h"
+ 
+ /* Currently only one window */
+ SDL_Window *Android_Window = NULL;
+@@ -49,9 +48,6 @@
+         goto endfunction;
+     }
+ 
+-    /* Set orientation */
+-    Android_JNI_SetOrientation(window->w, window->h, window->flags & SDL_WINDOW_RESIZABLE, SDL_GetHint(SDL_HINT_ORIENTATIONS));
+-
+     /* Adjust the window data to match the screen */
+     window->x = 0;
+     window->y = 0;
+--- love/src/jni/SDL2/android-project/app/jni/Application.mk.orig	2022-02-12 13:45:01.000000000 -0500
++++ love/src/jni/SDL2/android-project/app/jni/Application.mk	2022-02-12 13:45:34.000000000 -0500
+@@ -3,8 +3,3 @@
+ # You can find more information here:
+ # https://developer.android.com/ndk/guides/cpp-support
+ # APP_STL := c++_shared
+-
+-APP_ABI := armeabi-v7a arm64-v8a x86 x86_64
+-
+-# Min runtime API level
+-APP_PLATFORM=android-16

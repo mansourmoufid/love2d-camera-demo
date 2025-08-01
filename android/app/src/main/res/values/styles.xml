@@ -1,0 +1,11 @@
+<resources>
+  <style name="Love2dCameraDemoTheme" parent="Theme.AppCompat.DayNight">
+    <item name="android:windowNoTitle">true</item>
+    <item name="android:windowActionBar">false</item>
+    <item name="android:windowFullscreen">true</item>
+    <item name="android:fitsSystemWindows">true</item>
+    <item name="android:windowLayoutInDisplayCutoutMode">
+      shortEdges <!-- default, shortEdges, or never -->
+    </item>
+  </style>
+</resources>

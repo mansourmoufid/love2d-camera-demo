@@ -1,0 +1,108 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
+    ndkVersion rootProject.ext.ndkVersion
+
+    defaultConfig {
+        minSdkVersion rootProject.ext.minSdkVersion
+        externalNativeBuild {
+            ndkBuild {
+                arguments "-j" + Runtime.runtime.availableProcessors()
+            }
+        }
+        ndk {
+            // Specifies the ABI configurations of your native
+            // libraries Gradle should build and package with your APK.
+            abiFilters 'armeabi-v7a', 'arm64-v8a'
+            debugSymbolLevel 'SYMBOL_TABLE'
+        }
+        targetSdkVersion rootProject.ext.targetSdkVersion
+    }
+
+    def retrieveAll3pModules = { ->
+        def modules = []
+
+        fileTree("src/jni/lua-modules").visit { FileVisitDetails details ->
+            if (details.isDirectory()) {
+                if (file(details.file.path + "/Android.mk").exists()) {
+                    logger.lifecycle("3rd-party module: " + details.file.path)
+
+                    def javainfo = file(details.file.path + "/java.txt")
+                    if (javainfo.exists()) {
+                        def fstream = new FileInputStream(javainfo)
+                        def infile = new BufferedReader(new InputStreamReader(fstream))
+                        def javapath = infile.readLine().replace("\\", "/")
+                        def mpath = null
+
+                        if (javapath[0] != '/') {
+                            mpath = details.file.path + "/" + javapath
+                        } else {
+                            mpath = details.file.path + javapath
+                        }
+
+                        modules << mpath
+
+                        logger.lifecycle("Registered path " + mpath)
+                        infile.close()
+                    }
+                }
+            }
+        }
+
+        return modules
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            ndk {
+                // abiFilters += 'x86_64'
+            }
+        }
+    }
+    flavorDimensions 'mode'
+    productFlavors {
+        // normal {
+        //     dimension 'mode'
+        // }
+        embed {
+            dimension 'mode'
+        }
+    }
+    sourceSets {
+        main {
+            java {
+                srcDir 'src/jni/SDL2/android-project/app/src/main/java'
+                srcDir 'src/main/java'
+                srcDirs += retrieveAll3pModules()
+            }
+        }
+        // normal {
+        //     java {
+        //         srcDirs += 'src/normal/java'
+        //     }
+        // }
+    }
+    externalNativeBuild {
+        ndkBuild {
+            path 'src/jni/Android.mk'
+        }
+    }
+    lintOptions {
+        abortOnError false
+    }
+    packagingOptions {
+        exclude 'lib/arm64-v8a/libSDL2.so'
+        exclude 'lib/armeabi-v7a/libSDL2.so'
+    }
+}
+
+dependencies {
+    api fileTree(dir: 'libs', include: ['*.jar'])
+    api 'androidx.appcompat:appcompat:1.4.0'
+}
